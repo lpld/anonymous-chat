@@ -1,53 +1,52 @@
 package controllers
 
-import java.time.Instant
+import actors._
+import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.pattern.ask
+import akka.stream.Materializer
+import akka.util.Timeout
+import javax.inject.{Inject, Named}
+import play.api.Logger
+import play.api.libs.streams.ActorFlow
+import play.api.mvc._
 
-import akka.actor.{ActorSystem, Props}
-import dao.ChatRepository
-import javax.inject.Inject
-import model.{ChatEngine, ChatMessage}
-import play.api.mvc.{AbstractController, ControllerComponents}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.duration.DurationLong
 
 /**
   * @author leopold
   * @since 9/04/18
   */
-class ChatController @Inject()(system: ActorSystem,
-                               chatRepo: ChatRepository,
-                               cc: ControllerComponents) extends AbstractController(cc) {
+class ChatController @Inject()(
+                                @Named("chatEngine") chatEngine: ActorRef,
+                                cc: ControllerComponents)
+                              (implicit ec: ExecutionContext,
+                               ac: ActorSystem,
+                               mat: Materializer) extends AbstractController(cc) {
 
-  def selectChat = Action {
-    Ok(views.html.selectChat())
+  def displayChat = Action.async { implicit request =>
+    val form = request.body.asFormUrlEncoded.get
+    val username = form("username").head
+    val title = form("title").head
+    val key = form("key").head
+    implicit val to: Timeout = 10.seconds
+
+    (chatEngine ? FindOrCreateChat(key, title))
+      .map(_ =>
+        Ok(views.html.displayChat(username, title))
+          .withSession("chatKey" -> key, "username" -> username)
+      )
+
   }
 
-  def createChat(key: String, title: String) = Action {
-    Ok
-  }
-
-  def findChat(key: String) = Action {
-    chatRepo.findChat(key)
-      .map(chat => Redirect(s"chats/${chat.id}"))
-      .getOrElse(NotFound)
-  }
-
-  def displayChat(id: Long) = Action {
-    chatRepo
-      .getChat(id)
-      .map { chat =>
-        val chatActor = system.actorOf(Props(classOf[ChatEngine], chat), s"chat-engine-$id")
-
-        Ok(views.html.displayChat(
-          chat,
-          Seq(
-            ChatMessage(id = 1, author = None, authorName = "user1", text = "Test 1234", time = Instant.now() minusSeconds 120),
-            ChatMessage(id = 2, author = None, authorName = "user2", text = "Test 2345", time = Instant.now() minusSeconds 60),
-            ChatMessage(id = 3, author = None, authorName = "user1", text = "Test 4567", time = Instant.now())
-          )
-        ))
-
-      } getOrElse {
-      NotFound
-    }
-
+  def connect = WebSocket.acceptOrResult[String, String] { request =>
+    val username = request.session("username")
+    Logger.info(s"New websocket connection: $username")
+    implicit val to: Timeout = 10.seconds
+    for {
+      chat <- (chatEngine ? FindChat(request.session("chatKey"))).mapTo[ActorRef]
+      _ = Logger.info(s"Found chat for user $username")
+      participant <- (chat ? RegisterParticipant(username)).mapTo[ActorRef]
+    } yield Right(ActorFlow.actorRef(source => Props(classOf[ChatConnection], participant, source)))
   }
 }

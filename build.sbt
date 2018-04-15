@@ -1,4 +1,4 @@
-name := """anonymous-displayChat"""
+name := """anonymous-chat"""
 organization := "com.github.lpld"
 
 version := "1.0-SNAPSHOT"

@@ -1,11 +1,24 @@
+@()(implicit request: RequestHeader)
+
 @main(s"Anonymous chat - Please, enter your code") {
 
     <h1>Anonymous chat - Please, enter your code</h1>
 
-    <form action="@routes.ChatController.findChat()">
-        <label>
-            <input id="key" type="text"/>
+
+    <form action="@helper.CSRF(routes.ChatController.displayChat)" method="post">
+        <label for="key">
+            Code
+            <input id="key" name="key" type="text"/>
         </label>
+        <label>
+            Username
+            <input id="username" name="username" type="text"/>
+        </label>
+        <label for="name">
+            Title (optional)
+            <input id="title" name="title" type="text"/>
+        </label>
+
         <input type="submit" value="Enter">
     </form>
 }

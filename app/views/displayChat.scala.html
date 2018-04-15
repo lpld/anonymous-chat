@@ -1,22 +1,18 @@
-@import model.Chat
-@import model.ChatMessage
+@(username: String, title: String)(implicit request: RequestHeader)
 
-@(chat: Chat, messages: Seq[ChatMessage])
+@main(s"Anonymous chat - $title") {
 
-@main(s"Anonymous chat - ${chat.title}") {
-    <h1>Anonymous chat - @chat.title</h1>
+
+    <h1>Anonymous chat - @title</h1>
     <div id="messages">
-    @for(message <- messages) {
-        <p id="message-@message.id">
-            <strong>@message.authorName</strong>
-            @message.text (@message.time)
-        </p>
-    }
     </div>
     <label>
-        <input type="text"/>
+        @username
+        <input type="text" id="newMessage"/>
     </label>
-    <input type="button" value="post">
+    <input id="sendBtn" type="button" value="Send">
+    <input type="hidden" id="socketUrl" value="@routes.ChatController.connect().webSocketURL()" />
 
+    <script src="@routes.Assets.versioned("javascripts/chat_connection.js")" ></script>
 }
 

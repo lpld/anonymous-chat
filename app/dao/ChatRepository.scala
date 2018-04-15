@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 import javax.inject.Singleton
-import model.Chat
+import model.ChatInfo
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -17,15 +17,15 @@ import scala.collection.mutable
 class ChatRepository {
 
   private val ids: AtomicInteger = new AtomicInteger(1)
-  private val chats: mutable.Map[Long, Chat] = new ConcurrentHashMap[Long, Chat]().asScala
+  private val chats: mutable.Map[Long, ChatInfo] = new ConcurrentHashMap[Long, ChatInfo]().asScala
 
-  def createChat(key: String, title: String): Chat = {
-    val chat = Chat(ids.incrementAndGet(), title, key, None)
+  def createChat(key: String, title: String): ChatInfo = {
+    val chat = ChatInfo(ids.incrementAndGet(), title, key, None)
     chats(chat.id) = chat
     chat
   }
 
-  def findChat(key: String): Option[Chat] = chats.values.find(_.key == key)
+  def findChat(key: String): Option[ChatInfo] = chats.values.find(_.key == key)
 
-  def getChat(id: Long): Option[Chat] = chats.get(id)
+  def getChat(id: Long): Option[ChatInfo] = chats.get(id)
 }

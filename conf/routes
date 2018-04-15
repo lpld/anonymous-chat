@@ -7,11 +7,8 @@
 GET         /                    controllers.HomeController.index
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file        controllers.Assets.versioned(path="/public", file)
 
-GET         /chats               controllers.ChatController.selectChat
-
-POST        /chats               controllers.ChatController.findChat(key: String)
-
-GET         /chats/:id           controllers.ChatController.displayChat(id: Long)
+POST        /chat                controllers.ChatController.displayChat
+GET         /chat/connect        controllers.ChatController.connect
 
