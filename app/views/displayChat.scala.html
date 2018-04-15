@@ -1,0 +1,22 @@
+@import model.Chat
+@import model.ChatMessage
+
+@(chat: Chat, messages: Seq[ChatMessage])
+
+@main(s"Anonymous chat - ${chat.title}") {
+    <h1>Anonymous chat - @chat.title</h1>
+    <div id="messages">
+    @for(message <- messages) {
+        <p id="message-@message.id">
+            <strong>@message.authorName</strong>
+            @message.text (@message.time)
+        </p>
+    }
+    </div>
+    <label>
+        <input type="text"/>
+    </label>
+    <input type="button" value="post">
+
+}
+

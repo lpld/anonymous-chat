@@ -1,0 +1,11 @@
+@main(s"Anonymous chat - Please, enter your code") {
+
+    <h1>Anonymous chat - Please, enter your code</h1>
+
+    <form action="@routes.ChatController.findChat()">
+        <label>
+            <input id="key" type="text"/>
+        </label>
+        <input type="submit" value="Enter">
+    </form>
+}
