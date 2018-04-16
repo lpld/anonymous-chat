@@ -19,18 +19,14 @@ class ChatEngine @Inject() extends Actor with ActorLogging {
   override def preStart(): Unit = log.info("ChatEngine started")
 
   override def receive: Receive = {
-    case FindOrCreateChat(key, title) =>
+    case FindOrCreateRoom(key, title) =>
       sender() ! chats.getOrElse(key, {
         log.info(s"Creating new chat $title with key $key")
-        val newChat: actor.ActorRef = context.actorOf(Chat(key, title))
+        val newChat: actor.ActorRef = context.actorOf(ChatRoom(key, title))
         chats = chats + (key -> newChat)
         newChat
       })
-    case FindChat(key) => sender() ! chats(key)
-    case CreateChat(key, title) =>
-      val chat = context.actorOf(Chat(key, title))
-      chats += (key -> chat)
-      sender() ! chat
+    case GetRoom(key) => sender() ! chats(key)
   }
 }
 

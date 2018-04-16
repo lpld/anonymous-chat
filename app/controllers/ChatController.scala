@@ -17,21 +17,19 @@ import scala.concurrent.duration.DurationLong
   * @author leopold
   * @since 9/04/18
   */
-class ChatController @Inject()(
-                                @Named("chatEngine") chatEngine: ActorRef,
-                                cc: ControllerComponents)
-                              (implicit ec: ExecutionContext,
-                               ac: ActorSystem,
-                               mat: Materializer) extends AbstractController(cc) {
+class ChatController @Inject()(@Named("chatEngine") chatEngine: ActorRef, cc: ControllerComponents)
+                              (implicit ec: ExecutionContext, ac: ActorSystem, mat: Materializer)
+  extends AbstractController(cc) {
 
   def displayChat = Action.async { implicit request =>
     val form = request.body.asFormUrlEncoded.get
     val username = form("username").head
     val title = form("title").head
     val key = form("key").head
+
     implicit val to: Timeout = 10.seconds
 
-    (chatEngine ? FindOrCreateChat(key, title))
+    (chatEngine ? FindOrCreateRoom(key, title))
       .map(_ =>
         Ok(views.html.displayChat(username, title))
           .withSession("chatKey" -> key, "username" -> username)
@@ -44,9 +42,8 @@ class ChatController @Inject()(
     Logger.info(s"New websocket connection: $username")
     implicit val to: Timeout = 10.seconds
     for {
-      chat <- (chatEngine ? FindChat(request.session("chatKey"))).mapTo[ActorRef]
+      room <- (chatEngine ? GetRoom(request.session("chatKey"))).mapTo[ActorRef]
       _ = Logger.info(s"Found chat for user $username")
-      participant <- (chat ? RegisterParticipant(username)).mapTo[ActorRef]
-    } yield Right(ActorFlow.actorRef(source => Props(classOf[ChatConnection], participant, source)))
+    } yield Right(ActorFlow.actorRef(source => Props(classOf[ChatConnection], room, source, username)))
   }
 }
