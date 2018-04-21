@@ -2,7 +2,7 @@ var socket;
 
 function send() {
     var text = document.getElementById("newMessage").value;
-    socket.send(text);
+    socket.send(JSON.stringify({text: text}));
 }
 
 window.onload = function () {
@@ -20,10 +20,25 @@ function connect(url) {
 
     socket.onmessage = function (message) {
         console.log(message);
-        var p = document.createElement("p");
-        var msg = document.createTextNode(message.data);
-        p.appendChild(msg);
-        document.getElementById("messages").appendChild(p);
+        var msgJson = JSON.parse(message.data);
+
+        var template = document.getElementById('template_msg').innerHTML;
+
+        Mustache.parse(template);
+        var rendered = Mustache.render(template,
+            {
+                fstColumn: msgJson.fromMe ? "block" : "none",
+                columnStyle: msgJson.fromMe ? "is-warning" : "is-primary",
+                author: msgJson.author,
+                time: msgJson.time,
+                text: msgJson.text
+            });
+
+        var c = document.createElement("div");
+        c.innerHTML = rendered;
+        var messages = document.getElementById("messages");
+        messages.appendChild(c);
+        messages.scrollTop = messages.scrollHeight;
     };
 
     socket.onopen = function () {

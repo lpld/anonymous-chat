@@ -1,24 +1,40 @@
 @()(implicit request: RequestHeader)
 
-@main(s"Anonymous chat - Please, enter your code") {
+@main(s"Select chat") {
 
-    <h1>Anonymous chat - Please, enter your code</h1>
+    <div class="columns">
+        <div class="column is-1"></div>
+        <div class="column is-5">
+            <h1 class="title">Please, enter your code</h1>
+            <form action="@helper.CSRF(routes.ChatController.displayChat)" method="post">
+                <div class="field">
+                    <label class="label" for="key">Code</label>
+                    <div class="control">
+                        <input id="key" class="input" name="key" type="text"/>
+                    </div>
+                </div>
 
+                <div class="field">
+                    <label class="label" for="username">Username</label>
+                    <div class="control">
+                        <input id="username" class="input" name="username" type="text"/>
+                    </div>
+                </div>
 
-    <form action="@helper.CSRF(routes.ChatController.displayChat)" method="post">
-        <label for="key">
-            Code
-            <input id="key" name="key" type="text"/>
-        </label>
-        <label>
-            Username
-            <input id="username" name="username" type="text"/>
-        </label>
-        <label for="name">
-            Title (optional)
-            <input id="title" name="title" type="text"/>
-        </label>
+                <div class="field">
+                    <label class="label" for="title">Title (optional)</label>
+                    <div class="control">
+                        <input id="title" class="input" name="title" type="text"/>
+                    </div>
+                </div>
 
-        <input type="submit" value="Enter">
-    </form>
+                <div class="field">
+                    <div class="control">
+                        <input type="submit" class="button" value="Enter">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
 }

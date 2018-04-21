@@ -22,7 +22,7 @@ class ChatRoom(key: String, title: String) extends Actor with ActorLogging {
       log.info(s"New connection to room $title: $name")
       val time = Instant.now()
       sender ! ReceiveMessage("chatbot", fromMe = false, "Welcome", time)
-      val notification = ReceiveMessage("chatbot", false, s"$name connected", time)
+      val notification = ReceiveMessage("chatbot", fromMe = false, s"$name connected", time)
       connections.keys.foreach(_ ! notification)
       connections += (sender -> name)
 

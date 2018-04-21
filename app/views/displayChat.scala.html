@@ -2,17 +2,63 @@
 
 @main(s"Anonymous chat - $title") {
 
+    <h1 class="title">@title</h1>
 
-    <h1>Anonymous chat - @title</h1>
-    <div id="messages">
+    <div style="overflow-y: scroll;
+        height: 400px;" id="messages">
+
+        @*<div class="columns">*@
+            @*<div class="column is-11">*@
+                @*<div class="notification is-primary">*@
+                    @*<div>*@
+                        @*<strong>{{author}}</strong> ({{time}})*@
+                    @*</div>*@
+
+                    @*<div>*@
+                        @*{{text}}*@
+                    @*</div>*@
+                @*</div>*@
+            @*</div>*@
+        @*</div>*@
+
     </div>
-    <label>
-        @username
-        <input type="text" id="newMessage"/>
-    </label>
-    <input id="sendBtn" type="button" value="Send">
-    <input type="hidden" id="socketUrl" value="@routes.ChatController.connect().webSocketURL()" />
 
+
+    <div class="columns">
+        <div class="column is-10" >
+            <div style="float: left;
+                padding-right: 1em">
+                <label class="label" for="newMessage">@username:</label>
+            </div>
+            <div style="overflow: auto">
+                <input type="text" class="input" id="newMessage"/>
+            </div>
+        </div>
+        <div class="column is-2">
+            <input id="sendBtn" class="button" type="button" value="Send">
+        </div>
+        <input type="hidden" id="socketUrl" value="@routes.ChatController.connect().webSocketURL()" />
+    </div>
+
+    <script src="@routes.Assets.versioned("javascripts/mustache.min.js")" type="text/javascript"></script>
     <script src="@routes.Assets.versioned("javascripts/chat_connection.js")" ></script>
+
+    <script id="template_msg" type="x-tmpl-mustache">
+
+        <div class="columns">
+            <div class="column is-1" style="display: {{fstColumn}}"></div>
+            <div class="column is-11">
+                <div class="notification {{columnStyle}}">
+                    <div>
+                        <strong>{{author}}</strong> ({{time}})
+                    </div>
+
+                    <div>
+                        {{text}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
 }
 
