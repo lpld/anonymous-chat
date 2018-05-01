@@ -2,6 +2,7 @@ package controllers
 
 import db.{ChatUser, Db}
 import javax.inject.Inject
+import org.mindrot.jbcrypt.BCrypt
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.i18n.I18nSupport
@@ -42,7 +43,7 @@ class AuthController @Inject()(cc: ControllerComponents, db: Db)(implicit ectx: 
         run {
           query[ChatUser].insert(
             _.login -> lift(form.login),
-            _.passwordHash -> lift(form.password),
+            _.passwordHash -> lift(BCrypt.hashpw(form.password, BCrypt.gensalt())),
             _.name -> lift(form.name)
           )
         }
