@@ -1,0 +1,19 @@
+@(field: Field, label: String, password: Boolean = false, error: Option[String] = None)(implicit m: Messages)
+
+<div class="field">
+    <label class="label" for="@field.id">@label</label>
+    <div class="control">
+        <input
+        id="@field.id"
+        name="@field.name"
+        type="@if(password) {password} else {text}"
+        class="input @if(field.hasErrors || error.isDefined) {is-danger}"
+        value="@field.value.getOrElse("")">
+    </div>
+
+    @if(field.hasErrors || error.isDefined) {
+        <p class="help is-danger">
+        @((field.errors.map(e => m.messages(e.message, e.args)) ++ error).mkString(", "))
+        </p>
+    }
+</div>

@@ -1,0 +1,26 @@
+@(userForm: Form[UserData])(implicit request: RequestHeader, messages: Messages)
+
+@main("Register") {
+
+    <div class="columns">
+
+        <div class="column is-1"></div>
+        <div class="column is-5">
+            <h1 class="title">Register user</h1>
+
+            @helper.form(action = helper.CSRF(routes.AuthController.registerPost)) {
+                @bulma.inputText(userForm("login"), "Login")
+                @bulma.inputText(userForm("name"), "Name")
+                @bulma.inputText(userForm("password"), "Password", password = true)
+
+                @bulma.inputText(userForm("passwordRepeat"),
+                    "Password once more",
+                    password = true,
+                    error = userForm.globalError.map(_.message).filter(_ == "Passwords should match")
+                )
+
+                @bulma.submit("Register")
+            }
+        </div>
+    </div>
+}

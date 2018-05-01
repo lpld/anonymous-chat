@@ -12,3 +12,6 @@ GET         /assets/*file        controllers.Assets.versioned(path="/public", fi
 POST        /chat                controllers.ChatController.displayChat
 GET         /chat/connect        controllers.ChatController.connect
 
+GET         /register            controllers.AuthController.register
+POST        /register            controllers.AuthController.registerPost
+
